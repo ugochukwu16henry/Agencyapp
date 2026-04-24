@@ -3,6 +3,8 @@ import { notFound } from "next/navigation";
 
 import { createLead, getPropertyBySlug } from "@/lib/data";
 
+export const dynamic = "force-dynamic";
+
 export default async function PropertyDetailPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const property = await getPropertyBySlug(slug);

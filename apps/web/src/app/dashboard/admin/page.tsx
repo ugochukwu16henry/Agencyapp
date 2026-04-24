@@ -1,6 +1,8 @@
 import { VerificationQueue } from "@/features/admin/queue";
 import { BillingOverview } from "@/features/subscriptions/billing-overview";
 
+export const dynamic = "force-dynamic";
+
 export default function AdminDashboardPage() {
   return (
     <main className="mx-auto grid max-w-6xl gap-6 px-4 py-10 sm:px-6 lg:grid-cols-3">

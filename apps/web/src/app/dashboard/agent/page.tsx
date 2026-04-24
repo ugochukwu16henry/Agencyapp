@@ -1,5 +1,7 @@
 import { getSubscriptionOverview } from "@/lib/data";
 
+export const dynamic = "force-dynamic";
+
 export default async function AgentDashboardPage() {
   const subscriptions = await getSubscriptionOverview();
   const subscription = subscriptions[0];

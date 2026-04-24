@@ -3,6 +3,8 @@ import Link from "next/link";
 import { PropertyCard } from "@/features/properties/property-card";
 import { getPublicListings } from "@/lib/data";
 
+export const dynamic = "force-dynamic";
+
 export default async function Home() {
   const listings = await getPublicListings();
 
