@@ -4,6 +4,8 @@ import { notFound } from "next/navigation";
 import { PropertyMap } from "@/components/property-map";
 import { createLead, getPropertyBySlug } from "@/lib/data";
 
+const currencyFormatter = new Intl.NumberFormat("en-US");
+
 export const dynamic = "force-dynamic";
 
 export default async function PropertyDetailPage({ params }: { params: Promise<{ slug: string }> }) {
@@ -25,7 +27,7 @@ export default async function PropertyDetailPage({ params }: { params: Promise<{
       <section className="rounded-2xl border border-slate-200 bg-white p-6">
         <h1 className="text-3xl font-bold text-slate-900">{property.title}</h1>
         <p className="mt-2 text-slate-600">{property.description}</p>
-        <p className="mt-4 font-mono text-2xl font-bold text-emerald-600">{property.currency} {property.price.toLocaleString()}</p>
+        <p className="mt-4 font-mono text-2xl font-bold text-emerald-600">{property.currency} {currencyFormatter.format(property.price)}</p>
         {whatsappLink ? (
           <a
             href={whatsappLink}

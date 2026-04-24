@@ -6,6 +6,8 @@ import { motion } from "framer-motion";
 
 import type { Property } from "@/lib/types";
 
+const currencyFormatter = new Intl.NumberFormat("en-US");
+
 export function PropertyCard({ property }: { property: Property }) {
   const badgeLabel =
     property.trustTier === "MINISTRY_VERIFIED"
@@ -38,7 +40,7 @@ export function PropertyCard({ property }: { property: Property }) {
         <p className="text-xs text-slate-500">{badgeLabel}</p>
         <div className="flex items-center justify-between">
           <span className="font-mono text-xl font-bold text-emerald-600">
-            {property.currency} {property.price.toLocaleString()}
+            {property.currency} {currencyFormatter.format(property.price)}
           </span>
           <Link
             href={`/properties/${property.slug}`}

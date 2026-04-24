@@ -1,6 +1,12 @@
 import { getPendingQueue } from "@/lib/data";
 import { VerificationActions } from "@/features/admin/verification-actions";
 
+const auditDateFormatter = new Intl.DateTimeFormat("en-US", {
+  dateStyle: "medium",
+  timeStyle: "short",
+  timeZone: "UTC",
+});
+
 export async function VerificationQueue() {
   const { pending, events } = await getPendingQueue();
 
@@ -27,7 +33,7 @@ export async function VerificationQueue() {
             events.map((event) => (
               <li key={event.id}>
                 {event.actorId} - {event.property.title} - {event.previous} to {event.next} at{" "}
-                {new Date(event.createdAt).toLocaleString()}
+                {auditDateFormatter.format(new Date(event.createdAt))}
               </li>
             ))
           )}

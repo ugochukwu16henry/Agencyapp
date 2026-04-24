@@ -1,5 +1,10 @@
 import { getSubscriptionOverview } from "@/lib/data";
 
+const renewalDateFormatter = new Intl.DateTimeFormat("en-US", {
+  dateStyle: "medium",
+  timeZone: "UTC",
+});
+
 export async function BillingOverview() {
   const subscriptions = await getSubscriptionOverview();
 
@@ -15,7 +20,7 @@ export async function BillingOverview() {
             <p className="text-xs text-slate-600">Email: {subscription.agentEmail}</p>
             <p className="text-xs text-slate-600">Provider: {subscription.provider}</p>
             <p className="text-xs text-slate-600">Status: {subscription.status}</p>
-            <p className="text-xs text-slate-600">Renews: {new Date(subscription.renewalDate).toLocaleDateString()}</p>
+            <p className="text-xs text-slate-600">Renews: {renewalDateFormatter.format(new Date(subscription.renewalDate))}</p>
           </article>
         ))}
       </div>
