@@ -1,0 +1,19 @@
+import { subscriptions } from "@/lib/mock-db";
+
+export function BillingOverview() {
+  return (
+    <section className="rounded-2xl border border-slate-200 bg-white p-6">
+      <h2 className="mb-4 text-xl font-semibold text-slate-800">Agent Billing</h2>
+      <div className="space-y-3">
+        {subscriptions.map((subscription) => (
+          <article key={subscription.id} className="rounded-lg border border-slate-200 p-3">
+            <p className="text-sm font-medium text-slate-900">Agent: {subscription.agentUserId}</p>
+            <p className="text-xs text-slate-600">Provider: {subscription.provider}</p>
+            <p className="text-xs text-slate-600">Status: {subscription.status}</p>
+            <p className="text-xs text-slate-600">Renews: {new Date(subscription.renewalDate).toLocaleDateString()}</p>
+          </article>
+        ))}
+      </div>
+    </section>
+  );
+}
