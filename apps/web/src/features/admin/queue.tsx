@@ -1,7 +1,7 @@
-import { properties, verificationEvents } from "@/lib/mock-db";
+import { getPendingQueue } from "@/lib/data";
 
-export function VerificationQueue() {
-  const pending = properties.filter((property) => property.verificationStatus === "PENDING");
+export async function VerificationQueue() {
+  const { pending, events } = await getPendingQueue();
 
   return (
     <section className="space-y-4 rounded-2xl border border-slate-200 bg-white p-6">
@@ -19,10 +19,15 @@ export function VerificationQueue() {
       <div className="rounded-lg bg-slate-50 p-4">
         <h3 className="mb-2 font-medium text-slate-800">Verification Audit Log</h3>
         <ul className="space-y-1 text-xs text-slate-600">
-          {verificationEvents.length === 0 ? (
+          {events.length === 0 ? (
             <li>No approvals yet.</li>
           ) : (
-            verificationEvents.map((event) => <li key={event}>{event}</li>)
+            events.map((event) => (
+              <li key={event.id}>
+                {event.actorId} - {event.property.title} - {event.previous} to {event.next} at{" "}
+                {new Date(event.createdAt).toLocaleString()}
+              </li>
+            ))
           )}
         </ul>
       </div>

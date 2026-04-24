@@ -1,16 +1,19 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
-import { addLead, getPropertyBySlug, getWhatsappLink } from "@/lib/mock-db";
+import { createLead, getPropertyBySlug } from "@/lib/data";
 
 export default async function PropertyDetailPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const property = getPropertyBySlug(slug);
+  const property = await getPropertyBySlug(slug);
   if (!property || property.verificationStatus !== "APPROVED") notFound();
 
-  const whatsappLink = getWhatsappLink(property.id);
+  const message = encodeURIComponent(
+    `Hello, I am interested in ${property.title}. Can we schedule a visit?`,
+  );
+  const whatsappLink = `https://wa.me/${property.whatsappNumber}?text=${message}`;
   if (whatsappLink) {
-    addLead(property.id, "WHATSAPP");
+    await createLead(property.id, "WHATSAPP");
   }
 
   return (

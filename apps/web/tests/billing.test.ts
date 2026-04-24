@@ -1,20 +1,25 @@
+import crypto from "node:crypto";
 import { describe, expect, it } from "vitest";
 
-import { canAgentPublish, processBillingWebhook } from "@/lib/billing";
+import {
+  verifyFlutterwaveSignature,
+  verifyPaystackSignature,
+} from "@/lib/billing";
 
 describe("billing orchestrator", () => {
-  it("activates a subscription after successful webhook", () => {
-    const subscription = processBillingWebhook({
-      provider: "FLUTTERWAVE",
-      customerEmail: "agent@example.com",
-      reference: "trx-1",
-      status: "SUCCESS",
-    });
+  it("validates paystack webhook signatures", () => {
+    process.env.PAYSTACK_SECRET_KEY = "secret";
+    const payload = JSON.stringify({ reference: "trx-1" });
+    const signature = crypto
+      .createHmac("sha512", "secret")
+      .update(payload)
+      .digest("hex");
 
-    expect(subscription?.status).toBe("ACTIVE");
+    expect(verifyPaystackSignature(payload, signature)).toBe(true);
   });
 
-  it("allows publishing when active", () => {
-    expect(canAgentPublish("user-agent-1")).toBe(true);
+  it("validates flutterwave hash header", () => {
+    process.env.FLW_SECRET_HASH = "flw-hash";
+    expect(verifyFlutterwaveSignature("flw-hash")).toBe(true);
   });
 });

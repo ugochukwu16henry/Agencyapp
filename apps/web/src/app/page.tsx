@@ -1,10 +1,10 @@
 import Link from "next/link";
 
 import { PropertyCard } from "@/features/properties/property-card";
-import { getPublicListings } from "@/lib/mock-db";
+import { getPublicListings } from "@/lib/data";
 
-export default function Home() {
-  const listings = getPublicListings();
+export default async function Home() {
+  const listings = await getPublicListings();
 
   return (
     <main className="mx-auto max-w-6xl space-y-10 px-4 py-10 sm:px-6">

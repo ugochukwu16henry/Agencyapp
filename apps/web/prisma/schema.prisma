@@ -1,6 +1,5 @@
 generator client {
-  provider = "prisma-client"
-  output   = "../src/generated/prisma"
+  provider = "prisma-client-js"
 }
 
 datasource db {
@@ -77,6 +76,8 @@ model Property {
   locationLng        Float?
   verificationStatus VerificationStatus  @default(PENDING)
   trustTier          String              @default("MINISTRY_VERIFIED")
+  whatsappNumber     String?
+  coverImageUrl      String?
   isVerified         Boolean             @default(false)
   sitePlanUrl        String?
   constructionStep   Int                 @default(0)
@@ -161,12 +162,22 @@ model SubscriptionInvoice {
   id             String       @id @default(uuid())
   subscriptionId String
   subscription   Subscription @relation(fields: [subscriptionId], references: [id])
-  providerRef    String
+  providerRef    String       @unique
   amount         Decimal
   currency       String       @default("SLE")
   paidAt         DateTime?
   status         String
   createdAt      DateTime     @default(now())
+}
+
+model WebhookEvent {
+  id         String   @id @default(uuid())
+  provider   String
+  reference  String
+  payload    Json
+  receivedAt DateTime @default(now())
+
+  @@unique([provider, reference], name: "provider_reference")
 }
 
 model AuditLog {

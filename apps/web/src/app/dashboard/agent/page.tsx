@@ -1,6 +1,7 @@
-import { subscriptions } from "@/lib/mock-db";
+import { getSubscriptionOverview } from "@/lib/data";
 
-export default function AgentDashboardPage() {
+export default async function AgentDashboardPage() {
+  const subscriptions = await getSubscriptionOverview();
   const subscription = subscriptions[0];
 
   return (
