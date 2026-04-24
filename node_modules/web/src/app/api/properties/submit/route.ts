@@ -30,6 +30,10 @@ export async function POST(request: Request) {
       slug: payload.slug,
       description: payload.description,
       location: payload.location,
+      locationLat:
+        typeof payload.locationLat === "number" ? payload.locationLat : null,
+      locationLng:
+        typeof payload.locationLng === "number" ? payload.locationLng : null,
       price: payload.price,
       currency: payload.currency ?? "SLE",
       category: (payload.category ?? "LAND") as PropertyCategory,

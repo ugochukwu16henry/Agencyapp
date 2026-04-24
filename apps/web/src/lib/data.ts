@@ -13,6 +13,8 @@ type UiProperty = {
   slug: string;
   description: string;
   location: string;
+  locationLat?: number | null;
+  locationLng?: number | null;
   price: number;
   currency: string;
   category: "LAND" | "HOUSE" | "APARTMENT";
@@ -38,6 +40,8 @@ const toUiProperty = (property: {
   slug: string;
   description: string;
   location: string;
+  locationLat?: number | null;
+  locationLng?: number | null;
   price: { toNumber(): number };
   currency: string;
   category: PropertyCategory;
@@ -54,6 +58,8 @@ const toUiProperty = (property: {
     slug: property.slug,
     description: property.description,
     location: property.location,
+    locationLat: property.locationLat ?? null,
+    locationLng: property.locationLng ?? null,
     price: property.price.toNumber(),
     currency: property.currency,
     category: property.category,

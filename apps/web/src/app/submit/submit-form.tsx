@@ -55,6 +55,12 @@ export function SubmitForm() {
         ownerName: String(formData.get("ownerName") ?? ""),
         imageUrl: String(formData.get("imageUrl") ?? ""),
         sitePlanUrl,
+        locationLat: Number.isFinite(Number(formData.get("locationLat")))
+          ? Number(formData.get("locationLat"))
+          : null,
+        locationLng: Number.isFinite(Number(formData.get("locationLng")))
+          ? Number(formData.get("locationLng"))
+          : null,
       };
 
       const response = await fetch("/api/properties/submit", {
@@ -89,6 +95,8 @@ export function SubmitForm() {
         <input name="imageUrl" required placeholder="Cover image URL" className="rounded-lg border border-slate-300 px-3 py-2 text-sm" />
         <input name="ownerName" required placeholder="Owner name" className="rounded-lg border border-slate-300 px-3 py-2 text-sm" />
         <input name="ownerEmail" required placeholder="Owner email" className="rounded-lg border border-slate-300 px-3 py-2 text-sm" />
+        <input name="locationLat" type="number" step="any" placeholder="Latitude (optional)" className="rounded-lg border border-slate-300 px-3 py-2 text-sm" />
+        <input name="locationLng" type="number" step="any" placeholder="Longitude (optional)" className="rounded-lg border border-slate-300 px-3 py-2 text-sm" />
       </div>
 
       <textarea name="description" required placeholder="Description" className="min-h-28 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm" />

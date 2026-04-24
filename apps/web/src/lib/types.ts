@@ -8,6 +8,8 @@ export type Property = {
   slug: string;
   description: string;
   location: string;
+  locationLat?: number | null;
+  locationLng?: number | null;
   price: number;
   currency: string;
   category: "LAND" | "HOUSE" | "APARTMENT";

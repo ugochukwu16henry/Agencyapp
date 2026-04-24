@@ -3,6 +3,8 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
+import { createSupabaseBrowser } from "@/lib/supabase";
+
 type Props = {
   propertyId: string;
 };
@@ -17,13 +19,18 @@ const actions = [
 export function VerificationActions({ propertyId }: Props) {
   const router = useRouter();
   const [loadingStatus, setLoadingStatus] = useState<string | null>(null);
+  const supabase = createSupabaseBrowser();
 
   async function updateStatus(status: string) {
     setLoadingStatus(status);
+    const session = await supabase.auth.getSession();
+    const accessToken = session.data.session?.access_token;
+
     const response = await fetch("/api/properties/verify", {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
+        ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
         "x-role": "ADMIN",
       },
       body: JSON.stringify({

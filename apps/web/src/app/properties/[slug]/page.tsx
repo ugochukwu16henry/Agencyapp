@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import { PropertyMap } from "@/components/property-map";
 import { createLead, getPropertyBySlug } from "@/lib/data";
 
 export const dynamic = "force-dynamic";
@@ -33,7 +34,14 @@ export default async function PropertyDetailPage({ params }: { params: Promise<{
             WhatsApp Agent
           </a>
         ) : null}
+        <a
+          href={`/api/properties/${property.id}/brochure`}
+          className="ml-3 mt-6 inline-flex rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100"
+        >
+          Download Brochure
+        </a>
       </section>
+      <PropertyMap lat={property.locationLat} lng={property.locationLng} />
     </main>
   );
 }

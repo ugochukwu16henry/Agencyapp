@@ -3,14 +3,32 @@ import { VerificationStatus } from "@prisma/client";
 
 import { prisma } from "@/lib/prisma";
 import { assertRole } from "@/lib/rbac";
+import { createSupabaseAdmin } from "@/lib/supabase";
 
 export async function PATCH(request: Request) {
-  const userRole = request.headers.get("x-role") ?? "USER";
+  const authHeader = request.headers.get("authorization");
+  const fallbackRole = request.headers.get("x-role") ?? "USER";
+  const allowedAdmin = process.env.ADMIN_EMAIL ?? "admin@agencyapp.sl";
 
-  try {
-    assertRole(userRole as "ADMIN", ["ADMIN"]);
-  } catch {
-    return new NextResponse("Unauthorized", { status: 401 });
+  if (authHeader?.startsWith("Bearer ")) {
+    const token = authHeader.replace("Bearer ", "").trim();
+    try {
+      const supabaseAdmin = createSupabaseAdmin();
+      const {
+        data: { user },
+      } = await supabaseAdmin.auth.getUser(token);
+      if (!user || user.email !== allowedAdmin) {
+        return new NextResponse("Unauthorized", { status: 401 });
+      }
+    } catch {
+      return new NextResponse("Unauthorized", { status: 401 });
+    }
+  } else {
+    try {
+      assertRole(fallbackRole as "ADMIN", ["ADMIN"]);
+    } catch {
+      return new NextResponse("Unauthorized", { status: 401 });
+    }
   }
 
   const payload = await request.json();

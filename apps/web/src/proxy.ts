@@ -1,20 +1,45 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
+import { createServerClient } from "@supabase/ssr";
 
-const protectedRoutes = ["/dashboard/admin", "/api/properties/verify"];
+const protectedRoutes = ["/dashboard/admin", "/api/properties/verify", "/dashboard/crm"];
 
-export function proxy(request: NextRequest) {
+export async function proxy(request: NextRequest) {
+  const response = NextResponse.next();
   const path = request.nextUrl.pathname;
   const isProtected = protectedRoutes.some((route) => path.startsWith(route));
+  if (!isProtected) return response;
 
-  if (!isProtected) return NextResponse.next();
-
-  const role = request.headers.get("x-role");
-  if (role !== "ADMIN") {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  if (!url || !anonKey) {
     return new NextResponse("Unauthorized", { status: 401 });
   }
 
-  return NextResponse.next();
+  const supabase = createServerClient(url, anonKey, {
+    cookies: {
+      getAll() {
+        return request.cookies.getAll();
+      },
+      setAll(cookiesToSet) {
+        cookiesToSet.forEach(({ name, value, options }) => {
+          request.cookies.set(name, value);
+          response.cookies.set(name, value, options);
+        });
+      },
+    },
+  });
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  const allowedAdmin = process.env.ADMIN_EMAIL ?? "admin@agencyapp.sl";
+
+  if (!user || user.email !== allowedAdmin) {
+    return new NextResponse("Unauthorized", { status: 401 });
+  }
+
+  return response;
 }
 
 export const config = {
