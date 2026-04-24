@@ -24,6 +24,14 @@ type UiProperty = {
   ownerUserId: string;
 };
 
+type ListingFilters = {
+  query?: string;
+  category?: "LAND" | "HOUSE" | "APARTMENT" | "";
+  type?: "SALE" | "RENT" | "DEVELOPMENT" | "";
+  minPrice?: number;
+  maxPrice?: number;
+};
+
 const toUiProperty = (property: {
   id: string;
   title: string;
@@ -60,10 +68,31 @@ const toUiProperty = (property: {
     ownerUserId: property.ownerId,
   }) satisfies UiProperty;
 
-export async function getPublicListings() {
+export async function getPublicListings(filters?: ListingFilters) {
   try {
     const properties = await prisma.property.findMany({
-      where: { verificationStatus: VerificationStatus.APPROVED, deletedAt: null },
+      where: {
+        verificationStatus: VerificationStatus.APPROVED,
+        deletedAt: null,
+        ...(filters?.query
+          ? {
+              OR: [
+                { title: { contains: filters.query, mode: "insensitive" } },
+                { location: { contains: filters.query, mode: "insensitive" } },
+              ],
+            }
+          : {}),
+        ...(filters?.category ? { category: filters.category } : {}),
+        ...(filters?.type ? { type: filters.type } : {}),
+        ...(filters?.minPrice || filters?.maxPrice
+          ? {
+              price: {
+                ...(filters?.minPrice ? { gte: filters.minPrice } : {}),
+                ...(filters?.maxPrice ? { lte: filters.maxPrice } : {}),
+              },
+            }
+          : {}),
+      },
       orderBy: { createdAt: "desc" },
     });
     return properties.map(toUiProperty);
@@ -112,6 +141,42 @@ export async function getLeadMetrics() {
     return { totalLeads, whatsappLeads, callLeads, timeline };
   } catch {
     return { totalLeads: 0, whatsappLeads: 0, callLeads: 0, timeline: [] };
+  }
+}
+
+export async function getLeadAnalytics() {
+  try {
+    const [byChannel, byProperty] = await Promise.all([
+      prisma.lead.groupBy({
+        by: ["channel"],
+        _count: { channel: true },
+      }),
+      prisma.lead.groupBy({
+        by: ["propertyId"],
+        _count: { propertyId: true },
+        orderBy: { _count: { propertyId: "desc" } },
+        take: 10,
+      }),
+    ]);
+
+    const topPropertyIds = byProperty.map((item) => item.propertyId);
+    const properties = await prisma.property.findMany({
+      where: { id: { in: topPropertyIds } },
+      select: { id: true, title: true, owner: { select: { email: true } } },
+    });
+    const propertyMap = new Map(properties.map((p) => [p.id, p]));
+
+    return {
+      byChannel,
+      byProperty: byProperty.map((entry) => ({
+        propertyId: entry.propertyId,
+        count: entry._count.propertyId,
+        title: propertyMap.get(entry.propertyId)?.title ?? "Unknown",
+        partnerEmail: propertyMap.get(entry.propertyId)?.owner.email ?? "Unknown",
+      })),
+    };
+  } catch {
+    return { byChannel: [], byProperty: [] };
   }
 }
 

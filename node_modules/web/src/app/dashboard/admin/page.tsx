@@ -13,6 +13,7 @@ export default function AdminDashboardPage() {
           <li>Approval Queue</li>
           <li>Land Bank</li>
           <li>Financials</li>
+          <li>CRM Dashboard: /dashboard/crm</li>
         </ul>
       </section>
       <div className="space-y-6 lg:col-span-2">

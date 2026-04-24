@@ -1,4 +1,5 @@
 import { getPendingQueue } from "@/lib/data";
+import { VerificationActions } from "@/features/admin/verification-actions";
 
 export async function VerificationQueue() {
   const { pending, events } = await getPendingQueue();
@@ -13,6 +14,7 @@ export async function VerificationQueue() {
           <div key={property.id} className="rounded-lg border border-slate-200 p-4">
             <p className="font-medium text-slate-900">{property.title}</p>
             <p className="text-sm text-slate-500">{property.location}</p>
+            <VerificationActions propertyId={property.id} />
           </div>
         ))
       )}

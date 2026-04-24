@@ -1,5 +1,8 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
+import { motion } from "framer-motion";
 
 import type { Property } from "@/lib/types";
 
@@ -10,7 +13,11 @@ export function PropertyCard({ property }: { property: Property }) {
       : "Agent Listing: Buyer must do independent due diligence";
 
   return (
-    <article className="group overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition hover:shadow-xl">
+    <motion.article
+      whileHover={{ y: -4 }}
+      transition={{ duration: 0.2, ease: "easeOut" }}
+      className="group overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition hover:shadow-xl"
+    >
       <div className="relative h-64 overflow-hidden">
         <Image
           src={property.imageUrl}
@@ -41,6 +48,6 @@ export function PropertyCard({ property }: { property: Property }) {
           </Link>
         </div>
       </div>
-    </article>
+    </motion.article>
   );
 }
