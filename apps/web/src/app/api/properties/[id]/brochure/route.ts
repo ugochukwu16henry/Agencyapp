@@ -1,12 +1,13 @@
-import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
 import { NextResponse } from "next/server";
 
+import { loadPdfLib } from "@/lib/load-pdf-lib";
 import { prisma } from "@/lib/prisma";
 
 export async function GET(
   _request: Request,
   context: { params: Promise<{ id: string }> },
 ) {
+  const { PDFDocument, StandardFonts, rgb } = loadPdfLib();
   const { id } = await context.params;
   const property = await prisma.property.findUnique({
     where: { id },

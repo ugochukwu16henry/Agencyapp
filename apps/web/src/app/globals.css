@@ -11,3 +11,22 @@
 body {
   background-color: var(--color-surface);
 }
+
+.font-display {
+  font-family: "Space Grotesk", "Plus Jakarta Sans", "Segoe UI", sans-serif;
+}
+
+.hero-grid {
+  animation: rise-in 520ms ease-out both;
+}
+
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

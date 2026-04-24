@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
+import { MapPin, MessageCircle, ShieldCheck } from "lucide-react";
 
 import type { Property } from "@/lib/types";
 
@@ -18,7 +19,7 @@ export function PropertyCard({ property }: { property: Property }) {
     <motion.article
       whileHover={{ y: -4 }}
       transition={{ duration: 0.2, ease: "easeOut" }}
-      className="group overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition hover:shadow-xl"
+      className="group overflow-hidden rounded-[1.35rem] border border-slate-200 bg-white shadow-sm transition hover:shadow-xl"
     >
       <div className="relative h-64 overflow-hidden">
         <Image
@@ -35,19 +36,34 @@ export function PropertyCard({ property }: { property: Property }) {
       <div className="space-y-3 p-5">
         <div>
           <h3 className="text-lg font-bold text-slate-800">{property.title}</h3>
-          <p className="text-sm text-slate-500">{property.location}</p>
+          <p className="mt-1 inline-flex items-center gap-1 text-sm text-slate-500">
+            <MapPin className="h-3.5 w-3.5" />
+            {property.location}
+          </p>
         </div>
-        <p className="text-xs text-slate-500">{badgeLabel}</p>
+        <p className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-1 text-xs text-emerald-700">
+          <ShieldCheck className="h-3.5 w-3.5" />
+          {badgeLabel}
+        </p>
         <div className="flex items-center justify-between">
           <span className="font-mono text-xl font-bold text-emerald-600">
             {property.currency} {currencyFormatter.format(property.price)}
           </span>
+        </div>
+        <div className="flex items-center gap-2">
           <Link
             href={`/properties/${property.slug}`}
-            className="rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800"
+            className="inline-flex flex-1 items-center justify-center rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-slate-800"
           >
             View Details
           </Link>
+          <a
+            href={`https://wa.me/${property.whatsappNumber}?text=${encodeURIComponent(`Hello, I am interested in ${property.title}. Can we schedule a visit?`)}`}
+            className="inline-flex items-center justify-center rounded-lg border border-slate-300 px-3 py-2 text-slate-700 transition hover:border-slate-500 hover:bg-slate-50"
+            aria-label={`Chat about ${property.title} on WhatsApp`}
+          >
+            <MessageCircle className="h-4 w-4" />
+          </a>
         </div>
       </div>
     </motion.article>

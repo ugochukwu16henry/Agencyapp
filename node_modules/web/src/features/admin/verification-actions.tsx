@@ -31,12 +31,10 @@ export function VerificationActions({ propertyId }: Props) {
       headers: {
         "Content-Type": "application/json",
         ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
-        "x-role": "ADMIN",
       },
       body: JSON.stringify({
         propertyId,
         status,
-        approvedBy: "admin@agencyapp.sl",
       }),
     });
     setLoadingStatus(null);
