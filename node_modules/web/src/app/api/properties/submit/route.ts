@@ -2,6 +2,7 @@ import crypto from "node:crypto";
 import { NextResponse } from "next/server";
 import { PropertyCategory, PropertyType, VerificationStatus } from "@prisma/client";
 
+import { logEvent } from "@/lib/logger";
 import { prisma } from "@/lib/prisma";
 
 export async function POST(request: Request) {
@@ -45,6 +46,12 @@ export async function POST(request: Request) {
       ownerId,
       sitePlanUrl: payload.sitePlanUrl ?? null,
     },
+  });
+
+  logEvent("info", "property_submitted", {
+    propertyId: property.id,
+    ownerId,
+    verificationStatus: property.verificationStatus,
   });
 
   return NextResponse.json(property, { status: 201 });

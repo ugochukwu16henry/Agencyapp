@@ -4,6 +4,7 @@ import { VerificationStatus } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { assertRole } from "@/lib/rbac";
 import { createSupabaseAdmin } from "@/lib/supabase";
+import { logEvent } from "@/lib/logger";
 
 export async function PATCH(request: Request) {
   const authHeader = request.headers.get("authorization");
@@ -87,6 +88,12 @@ export async function PATCH(request: Request) {
     });
 
     return property;
+  });
+
+  logEvent("info", "property_status_changed", {
+    propertyId: updated.id,
+    nextStatus: status,
+    actorId: actor.id,
   });
 
   return NextResponse.json(updated);

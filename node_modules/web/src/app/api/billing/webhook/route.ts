@@ -5,6 +5,7 @@ import {
   verifyFlutterwaveSignature,
   verifyPaystackSignature,
 } from "@/lib/billing";
+import { logEvent } from "@/lib/logger";
 
 function normalizeWebhookPayload(
   provider: "PAYSTACK" | "FLUTTERWAVE",
@@ -48,6 +49,9 @@ export async function POST(request: Request) {
       : verifyFlutterwaveSignature(request.headers.get("verif-hash") ?? "");
 
   if (!validSignature) {
+    logEvent("warn", "billing_webhook_invalid_signature", {
+      provider: providerHeader,
+    });
     return new NextResponse("Invalid signature", { status: 401 });
   }
 
@@ -65,6 +69,16 @@ export async function POST(request: Request) {
     payload,
   );
 
-  if (!result) return new NextResponse("No subscription found", { status: 404 });
+  if (!result) {
+    logEvent("warn", "billing_webhook_subscription_missing", {
+      provider: providerHeader,
+      reference: normalized.reference,
+    });
+    return new NextResponse("No subscription found", { status: 404 });
+  }
+  logEvent("info", "billing_webhook_processed", {
+    provider: providerHeader,
+    reference: normalized.reference,
+  });
   return NextResponse.json(result);
 }
