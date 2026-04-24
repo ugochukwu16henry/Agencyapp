@@ -61,22 +61,30 @@ const toUiProperty = (property: {
   }) satisfies UiProperty;
 
 export async function getPublicListings() {
-  const properties = await prisma.property.findMany({
-    where: { verificationStatus: VerificationStatus.APPROVED, deletedAt: null },
-    orderBy: { createdAt: "desc" },
-  });
-  return properties.map(toUiProperty);
+  try {
+    const properties = await prisma.property.findMany({
+      where: { verificationStatus: VerificationStatus.APPROVED, deletedAt: null },
+      orderBy: { createdAt: "desc" },
+    });
+    return properties.map(toUiProperty);
+  } catch {
+    return [];
+  }
 }
 
 export async function getPropertyBySlug(slug: string) {
-  const property = await prisma.property.findFirst({
-    where: {
-      slug,
-      verificationStatus: VerificationStatus.APPROVED,
-      deletedAt: null,
-    },
-  });
-  return property ? toUiProperty(property) : null;
+  try {
+    const property = await prisma.property.findFirst({
+      where: {
+        slug,
+        verificationStatus: VerificationStatus.APPROVED,
+        deletedAt: null,
+      },
+    });
+    return property ? toUiProperty(property) : null;
+  } catch {
+    return null;
+  }
 }
 
 export async function createLead(propertyId: string, channel: "WHATSAPP" | "CALL") {
@@ -90,59 +98,69 @@ export async function createLead(propertyId: string, channel: "WHATSAPP" | "CALL
 }
 
 export async function getLeadMetrics() {
-  const [totalLeads, whatsappLeads, callLeads, timeline] = await Promise.all([
-    prisma.lead.count(),
-    prisma.lead.count({ where: { channel: "WHATSAPP" } }),
-    prisma.lead.count({ where: { channel: "CALL" } }),
-    prisma.lead.findMany({
-      orderBy: { createdAt: "desc" },
-      take: 50,
-      select: { id: true, propertyId: true, channel: true, createdAt: true },
-    }),
-  ]);
-
-  return { totalLeads, whatsappLeads, callLeads, timeline };
+  try {
+    const [totalLeads, whatsappLeads, callLeads, timeline] = await Promise.all([
+      prisma.lead.count(),
+      prisma.lead.count({ where: { channel: "WHATSAPP" } }),
+      prisma.lead.count({ where: { channel: "CALL" } }),
+      prisma.lead.findMany({
+        orderBy: { createdAt: "desc" },
+        take: 50,
+        select: { id: true, propertyId: true, channel: true, createdAt: true },
+      }),
+    ]);
+    return { totalLeads, whatsappLeads, callLeads, timeline };
+  } catch {
+    return { totalLeads: 0, whatsappLeads: 0, callLeads: 0, timeline: [] };
+  }
 }
 
 export async function getPendingQueue() {
-  const [pending, events] = await Promise.all([
-    prisma.property.findMany({
-      where: { verificationStatus: VerificationStatus.PENDING, deletedAt: null },
-      orderBy: { createdAt: "desc" },
-      take: 50,
-      select: { id: true, title: true, location: true },
-    }),
-    prisma.verificationEvent.findMany({
-      orderBy: { createdAt: "desc" },
-      take: 20,
-      select: {
-        id: true,
-        actorId: true,
-        previous: true,
-        next: true,
-        createdAt: true,
-        property: { select: { title: true } },
-      },
-    }),
-  ]);
-
-  return { pending, events };
+  try {
+    const [pending, events] = await Promise.all([
+      prisma.property.findMany({
+        where: { verificationStatus: VerificationStatus.PENDING, deletedAt: null },
+        orderBy: { createdAt: "desc" },
+        take: 50,
+        select: { id: true, title: true, location: true },
+      }),
+      prisma.verificationEvent.findMany({
+        orderBy: { createdAt: "desc" },
+        take: 20,
+        select: {
+          id: true,
+          actorId: true,
+          previous: true,
+          next: true,
+          createdAt: true,
+          property: { select: { title: true } },
+        },
+      }),
+    ]);
+    return { pending, events };
+  } catch {
+    return { pending: [], events: [] };
+  }
 }
 
 export async function getSubscriptionOverview() {
-  const rows = await prisma.subscription.findMany({
-    include: {
-      agent: { include: { user: { select: { id: true, email: true } } } },
-    },
-    orderBy: { updatedAt: "desc" },
-  });
+  try {
+    const rows = await prisma.subscription.findMany({
+      include: {
+        agent: { include: { user: { select: { id: true, email: true } } } },
+      },
+      orderBy: { updatedAt: "desc" },
+    });
 
-  return rows.map((row) => ({
-    id: row.id,
-    agentUserId: row.agent.user.id,
-    agentEmail: row.agent.user.email,
-    provider: row.provider,
-    status: row.status as SubscriptionStatus,
-    renewalDate: row.renewalDate?.toISOString() ?? new Date().toISOString(),
-  }));
+    return rows.map((row) => ({
+      id: row.id,
+      agentUserId: row.agent.user.id,
+      agentEmail: row.agent.user.email,
+      provider: row.provider,
+      status: row.status as SubscriptionStatus,
+      renewalDate: row.renewalDate?.toISOString() ?? new Date().toISOString(),
+    }));
+  } catch {
+    return [];
+  }
 }
