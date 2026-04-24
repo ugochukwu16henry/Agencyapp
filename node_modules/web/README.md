@@ -1,36 +1,45 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+## Agency App (Stage 1 + 2)
 
-## Getting Started
+Production-ready Next.js platform for verified property workflows, admin approvals, agent subscriptions, and CRM metrics.
 
-First, run the development server:
+## Local Setup
+
+```bash
+cd apps/web
+npm install
+```
+
+Set `DATABASE_URL` in `.env` to your Postgres/Supabase database, then run:
+
+```bash
+npm run db:generate
+npm run db:migrate
+npm run db:seed
+```
+
+Start the app:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Seeded Accounts
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- Admin: `admin@agencyapp.sl`
+- Partner: `partner1@agencyapp.sl`
+- Agent: `agent1@agencyapp.sl`
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Quality Commands
 
-## Learn More
+```bash
+npm run typecheck
+npm run lint
+npm run test
+npm run build
+```
 
-To learn more about Next.js, take a look at the following resources:
+## Notes
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- Billing webhook secrets:
+  - `PAYSTACK_WEBHOOK_SECRET` (or `PAYSTACK_SECRET_KEY`)
+  - `FLUTTERWAVE_WEBHOOK_SECRET` (or `FLW_SECRET_HASH`)
